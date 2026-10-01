@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>KESCO 계측장비 설명 일정 관리</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header><div class="wrap nav"><div class="logo">KESCO 계측장비 설명 일정 관리</div><div class="nav-sub" id="vendorInfo">업체 신청내역 관리</div><button class="btn secondary logout hidden" id="logoutBtn" onclick="logout()">로그아웃</button></div></header>
+<main class="wrap">
+<section class="box login-box" id="login">
+<h1 class="page-title">업체 로그인</h1><p class="small-note">관리자에게 전달받은 업체 접근코드를 입력하세요.</p>
+<div class="field"><label for="code">업체 접근코드</label><input autocomplete="off" id="code" placeholder="예: KESOXXXX"/></div>
+<button class="btn primary" onclick="login()">로그인</button>
+</section>
+<section class="hidden" id="requests">
+<div class="box"><div style="display:flex;justify-content:space-between;align-items:center;gap:15px"><div><h1 class="page-title" id="title">신청내역</h1><p class="small-note">상태와 확정일로 원하는 건을 빠르게 확인할 수 있습니다.</p></div><strong id="count">0건</strong></div><div class="toolbar"><select id="statusFilter" onchange="renderCurrent()"><option value="">전체 상태</option><option value="업체 회신 대기">회신 대기</option><option value="일정 협의 필요">일정 협의</option><option value="일정 확정">일정 확정</option><option value="일정 불가">일정 불가</option></select><input id="confirmedFilter" onchange="renderCurrent()" onclick="this.showPicker&amp;&amp;this.showPicker()" title="확정일 필터" type="date"/><select id="sortFilter" onchange="renderCurrent()"><option value="newest">최근 신청순</option><option value="oldest">오래된 신청순</option><option value="confirmed">확정일 빠른순</option></select></div><div class="summary" id="summary"></div></div>
+<div id="list"></div>
+</section>
+</main>
+<script src="../shared/config.js"></script>
+<script src="../shared/supabase.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
