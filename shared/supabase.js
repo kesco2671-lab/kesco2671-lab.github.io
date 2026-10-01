@@ -11,7 +11,6 @@ let KESCO_SYNCING = Promise.resolve();
 function sbHeaders(extra={}){
   return Object.assign({
     'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer '+SUPABASE_KEY,
     'Content-Type': 'application/json'
   }, extra);
 }
