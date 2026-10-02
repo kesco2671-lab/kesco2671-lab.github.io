@@ -144,9 +144,23 @@ async function replaceRequestChildren(requestId, rows){
   (rows[0]?.history||[]).forEach(h=>{
     const k=[h.at,h.status,h.detail,h.actor].join('|');
     if(seen.has(k))return;seen.add(k);
+
+    // 화면의 이력 종류와 DB의 상태값은 구분합니다.
+    // '확정 일정 변경', '신청내용 수정' 등은 화면 표시용 이력이고,
+    // request_history.status에는 실제 상태값만 저장합니다.
+    const historyStatusMap={
+      '신청 접수':'업체 회신 대기',
+      '신청내용 수정':rows[0]?.status||'업체 회신 대기',
+      '확정 일정 변경':'일정 확정',
+      '일정 불가 사유 수정':'일정 불가'
+    };
+    const allowed=['업체 회신 대기','일정 협의 필요','일정 확정','일정 불가'];
+    let historyStatus=historyStatusMap[h.status]||h.status||rows[0]?.status||null;
+    if(historyStatus && !allowed.includes(historyStatus)) historyStatus=rows[0]?.status||null;
+
     histories.push({
       request_id:requestId,
-      status:h.status||null,
+      status:historyStatus,
       detail:h.detail||'',
       actor_type:['사업소','업체','관리자','시스템'].includes(h.actor)?h.actor:'시스템',
       actor_name:null,
