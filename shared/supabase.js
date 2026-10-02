@@ -1,8 +1,8 @@
 /* KESCO Supabase 연결 모듈
  * 현재 화면은 기존 수정32 UI/로직을 유지하고, 데이터 저장만 Supabase로 전환합니다.
  */
-const SUPABASE_URL = 'https://zennpzvncrydckibewujo.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_y-MVtkOLn38eg7NLgXR6tQ_kvd_w1y';
+const SUPABASE_URL = 'https://bpavztuiimwhlzemysyk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_KmG68pZH0gHH7fg2P4JaZQ_vqjMBcFv';
 
 let KESCO_DB = null;
 let KESCO_DB_READY = false;
@@ -11,6 +11,7 @@ let KESCO_SYNCING = Promise.resolve();
 function sbHeaders(extra={}){
   return Object.assign({
     'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer '+SUPABASE_KEY,
     'Content-Type': 'application/json'
   }, extra);
 }
