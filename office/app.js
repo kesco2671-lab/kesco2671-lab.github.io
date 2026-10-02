@@ -60,6 +60,8 @@ function openApplyWithChecks(checks){
  document.getElementById('date1').min=todayISO();document.getElementById('date2').min=todayISO();showPage('apply');
 }
 function submitRequest(){
+ const submitBtn=document.getElementById('submitRequestBtn');
+ if(submitBtn?.disabled)return;
  let d=data(),a=document.getElementById('applicant').value.trim(),o=document.getElementById('office').value,ext=document.getElementById('extension').value.trim(),email=document.getElementById('email').value.trim(),d1=document.getElementById('date1').value,d2=document.getElementById('date2').value,m=document.getElementById('memo').value.trim();
  let ids=[];try{ids=JSON.parse(document.getElementById('apply').dataset.ids||'[]')}catch(e){}
  const vendorId=Number(document.getElementById('apply').dataset.vendorId||0),items=d.equipment.filter(e=>ids.includes(e.id));
@@ -69,9 +71,11 @@ function submitRequest(){
  if(d1===d2){alert('희망일 1과 희망일 2는 서로 다른 날짜를 선택해주세요.');return}
  if(items.some(e=>Number(e.vendorId)!==vendorId)){alert('같은 판매업체의 장비만 한 번에 신청할 수 있습니다.');return}
  if(!d.vendors.some(v=>v.id===vendorId)){alert('판매업체 정보를 찾을 수 없습니다.');return}
+ submitBtn.disabled=true;
+ submitBtn.textContent='저장 중...';
  const now=new Date().toISOString(),batchId='B'+Date.now();
  items.forEach((e,i)=>d.requests.push({id:Date.now()+i,batchId,equipmentId:e.id,vendorId,office:o,applicant:a,extension:ext,email,date1:d1,date2:d2,memo:m,status:'업체 회신 대기',confirmedDate:'',createdAt:now,history:[{at:now,status:'신청 접수',detail:'설명 일정 신청이 접수되었습니다.',actor:'사업소'}]}));
- save(d);alert(items.length+'개 장비의 설명 신청이 접수되었습니다.');['applicant','extension','email','date1','date2','memo'].forEach(id=>document.getElementById(id).value='');document.getElementById('apply').dataset.ids='[]';document.getElementById('apply').dataset.vendorId='';renderEquipment();showPage('equipment');
+ save(d);alert(items.length+'개 장비의 설명 신청이 접수되었습니다.');['applicant','extension','email','date1','date2','memo'].forEach(id=>document.getElementById(id).value='');document.getElementById('apply').dataset.ids='[]';document.getElementById('apply').dataset.vendorId='';submitBtn.disabled=false;submitBtn.textContent='설명 신청';renderEquipment();showPage('equipment');
 }
 function requestGroupKey(r){if(r.batchId)return 'batch:'+r.batchId;const day=(r.createdAt||'').slice(0,10);return ['legacy',r.vendorId,r.office,r.applicant,r.extension||'',r.email||'',day,r.date1||'',r.date2||'',r.memo||''].join('|')}
 function groupRequests(rows){const map=new Map();rows.forEach(r=>{const key=requestGroupKey(r);if(!map.has(key))map.set(key,{key,rows:[]});map.get(key).rows.push(r)});return [...map.values()].map(g=>{g.rows.sort((a,b)=>(new Date(a.createdAt||0).getTime()||a.id)-(new Date(b.createdAt||0).getTime()||b.id));const first=g.rows[g.rows.length-1];const rejected=g.rows.find(r=>r.status==='일정 불가');const histMap=new Map();g.rows.forEach(r=>(r.history||[]).forEach(h=>{const k=[h.at,h.status,h.detail,h.actor].join('|');if(!histMap.has(k))histMap.set(k,h)}));const history=[...histMap.values()].sort((a,b)=>String(b.at).localeCompare(String(a.at)));return {...first,groupIds:g.rows.map(r=>r.id),equipmentIds:[...new Set(g.rows.map(r=>r.equipmentId))],status:rejected?'일정 불가':(first.status||'업체 회신 대기'),rejectionReason:[...new Set(g.rows.map(r=>String(r.rejectionReason||'').trim()).filter(Boolean))].join(' / '),history}})}
